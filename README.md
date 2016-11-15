@@ -1,4 +1,4 @@
-Creates a jar file from the package in directory 'mypackage'.
+Create a jar file from the package in directory 'mypackage'.
 ==========================================================================
 
 
