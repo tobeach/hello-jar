@@ -1,0 +1,232 @@
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../iron-list/iron-list.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../paper-styles/default-theme.html">
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="paper-month-list">
+    <template>
+        <style>
+            :host {
+                display: block;
+                box-sizing: border-box;
+                height: 100%;
+                @apply(--paper-font-common-base);
+                /* for iron-list to fit */
+                position: relative;
+            }
+            .month {
+                cursor: pointer;
+                height: var(--paper-month-list-item-height, 44px);
+                line-height: var(--paper-month-list-item-height, 44px);
+                text-align: center;
+                vertical-align: middle;
+            }
+            .selected {
+                color: var(--default-primary-color);
+                font-size: 24px;
+            }
+            .today {
+                color: var(--default-primary-color);
+            }
+            iron-list {
+                @apply(--layout-fit);
+            }
+
+        </style>
+        <iron-list id="monthList" items="[[_months]]">
+            <template>
+                <div class$="month{{_addSelectedClass(selected, item)}} Month{{item.id}}" id$="Month{{item.id}}" on-tap="_tappedMonthHandler">
+                    {{dateFormat(item.month, 'MMMM', locale)}}
+                </div>
+            </template>
+    </iron-list>
+    </template>
+    <script>
+        Polymer({
+            is: 'paper-month-list',
+            properties: {
+                date: {
+                    type: Date,
+                    notify: true,
+                    observer: '_dateChange'
+                },
+                /**
+                 * Maximum allowed month.
+                 */
+                max: {
+                    type: Number,
+                    value: 11,
+                    observer: '_maxChange'
+                },
+                /**
+                 * Minimum allowed month.
+                 */
+                min: {
+                    type: Number,
+                    value: 0,
+                    observer: '_minChange'
+                },
+                /**
+                 * The current locale
+                 */
+                locale: {
+                    type: String,
+                    value: 'en'
+                },
+                /**
+                 * The selected month, sync with the month of the given date
+                 * or null if month isn't within range.
+                 */
+                selected: {
+                    type: Number,
+                    notify: true,
+                    observer: '_selectedChange'
+                },
+                /**
+                 * The allowed months array.
+                 */
+                _months: {
+                    type: Array,
+                    computed: '_computeMonths(min, max)',
+                    readOnly: true,
+                    value: function() {
+                        return Date.now().getFullYear;
+                    }
+
+                }
+            },
+            ready: function() {
+                // hack for iron-list not to scroll to the first visible index on resize
+                this.$.monthList._resizeHandler = function() {
+                    this.debounce('resize', function() {
+                        this._render();
+                        if (this._itemsRendered && this._physicalItems && this._isVisible) {
+                            this._resetAverage();
+                            this.updateViewportBoundaries();
+                        }
+                    });
+                }.bind(this.$.monthList);
+            },
+            /**
+             * Scroll in the months list to center the selected month.
+             */
+            centerSelected: function() {
+                if (this.selected !== null) {
+                    var selectedMonthIdx = this.selected - this.min;
+                    console.log(this.$.monthList);
+                    this.$.monthList.scrollToIndex(selectedMonthIdx);
+                    this.async(function() {
+                        var selectedPos = selectedMonthIdx * this._physicalAverage + 1;
+                        if (selectedPos !== this.scrollTop) {
+                            this.scrollTop = selectedPos;
+                        }
+                        if (this.scrollHeight - this.offsetHeight !== this.scrollTop) {
+                            this.scrollTop += (this._physicalAverage - this.offsetHeight) / 2;
+                        }
+                    }.bind(this.$.monthList));
+                }
+            },
+            /**
+             * Return the selected class if needed.
+             */
+            _addSelectedClass: function(selected, item) {
+                if (selected) {
+                    return ' selected';
+                }
+                var now = new Date();
+                if (item.month.getMonth() === now.getMonth()) {
+                    return ' today';
+                }
+            },
+            /**
+             * Compute the months array passed to the iron-list.
+             */
+            _computeMonths: function(min, max) {
+                if (typeof min !== 'number' || typeof max !== 'number') {
+                    return;
+                }
+                var months = [];
+                for (; min <= max; min++) {
+                    var tmpDate = new Date('01.01.2000');
+                    tmpDate.setMonth(min);
+                    months.push({
+                        month: tmpDate,
+                        id: min
+                    });
+                }
+                return months;
+            },
+            /**
+             * Set 'selected' attribute to the new date's month if it is within range, else set it to null.
+             */
+            _dateChange: function(date) {
+                var newMonth = date.getMonth();
+                this.selected = this._withinRange(newMonth) ?
+                    newMonth :
+                    null;
+
+            },
+            _maxChange: function(max) {
+                if (typeof max !== 'number') {
+                    this.max = 11;
+                }
+            },
+            _minChange: function(min) {
+                if (typeof min !== 'number') {
+                    this.min = 0;
+                }
+            },
+            /**
+             * If selected is null, clear iron-list selection,
+             * else select it in iron-list and synchronize 'date' attribute.
+             */
+            _selectedChange: function(selected) {
+                if (selected === null) {
+                    this.$.monthList.clearSelection();
+                    return;
+                }
+                if (selected !== this.date.getMonth()) {
+                    // set the month using a new Date instance for notifying to work
+                    this.date = new Date(this.date.setMonth(selected));
+                }
+                this._selectMonthInList(selected);
+            },
+            /**
+             * Select the given month in the months list.
+             */
+            _selectMonthInList: function(month) {
+                var monthIdx = month - this.min;
+                this.$.monthList.selectItem(monthIdx);
+            },
+            /**
+             * Update 'selected' attribute and select in iron-list
+             * from a tapped item's event in the months list.
+             */
+            _tappedMonthHandler: function(e) {
+                var monthItem = e.model.__data__.item;
+                var month = monthItem.id;
+                if (this.min !== month) {
+                    this.$.monthList.selectItem(monthItem);
+                    this.selected = month;
+                }
+            },
+            dateFormat: function(date, format, locale) {
+                if (!date) {
+                    return '';
+                }
+                var value = moment(date);
+                value.locale(locale || this.locale);
+                return value.format(format);
+            },
+            /**
+             * Return true if month is between min and max.
+             */
+            _withinRange: function(month) {
+                return !(this.min && month < this.min || this.max && month > this.max);
+            },
+            behaviors: [Polymer.IronResizableBehavior]
+        });
+    </script>
+</dom-module>

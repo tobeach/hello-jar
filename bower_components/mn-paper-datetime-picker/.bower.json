@@ -1,0 +1,60 @@
+{
+  "name": "mn-paper-datetime-picker",
+  "version": "1.1.4",
+  "description": "Provides a responsive datetime picker based on the material design spec",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "timepicker",
+    "paper-time-picker",
+    "datepicker",
+    "paper-date-picker",
+    "paper-datetime-picker"
+  ],
+  "main": "mn-paper-datetime-picker.html",
+  "license": "MIT",
+  "homepage": "https://nema1012.github.io/mn-paper-datetime-picker/",
+  "ignore": [
+    "/.*",
+    "/tests/",
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "moment-element": "bendavis78/moment-element#^1.1.0",
+    "polymer": "Polymer/polymer#^1.1.0",
+    "iron-media-query": "PolymerElements/iron-media-query#^1.0.0",
+    "iron-selector": "PolymerElements/iron-selector#^1.0.0",
+    "neon-animation": "PolymerElements/neon-animation#^1.0.0",
+    "iron-resizable": "PolymerElements/iron-resizable-behavior#^1.0.0",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.0",
+    "iron-pages": "PolymerElements/iron-pages#^1.0.0",
+    "iron-icon": "PolymerElements/iron-icon#^1.0.7",
+    "paper-ripple": "PolymerElements/paper-ripple#^1.0.5",
+    "paper-icon-button": "PolymerElements/paper-icon-button#^1.0.0",
+    "iron-list": "PolymerElements/iron-list#~1.3.9"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "paper-dialog": "PolymerElements/paper-dialog#^1.0.0",
+    "paper-button": "PolymerElements/paper-button#^1.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^0.7.2"
+  },
+  "_release": "1.1.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.1.4",
+    "commit": "cf4fcda55871a90327f527490e39f17e1d6d8ec0"
+  },
+  "_source": "https://github.com/nema1012/mn-paper-datetime-picker.git",
+  "_target": "^1.1.4",
+  "_originalSource": "mn-paper-datetime-picker"
+}

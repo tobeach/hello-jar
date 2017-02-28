@@ -1,0 +1,45 @@
+<style is="custom-style">
+    /* mixin definitions */
+    :root {
+        --paper-datetime-picker-dialog-picker: {
+            margin-top: 0 !important;
+            padding: 0;
+        };
+        --paper-datetime-picker-dialog-calendar: {
+            padding-bottom: 0;
+        };
+        --paper-datetime-picker-dialog-heading: {
+            margin-bottom: -56px;
+        };
+        --paper-datetime-picker-dialog: {
+            margin: 0;
+            max-height: 95% !important;
+            max-width: 90% !important;
+            overflow: hidden;
+        };
+    }
+
+</style>
+
+<dom-module id="paper-datetime-picker-dialog-style">
+    <template>
+        <style>
+            /* Application of mixins to local .paper-datetime-picker-dialog elements */
+            .paper-datetime-picker-dialog {
+                @apply(--paper-datetime-picker-dialog);
+            }
+            .paper-datetime-picker-dialog > paper-datetime-picker {
+                --paper-calendar: {
+                    @apply(--paper-datetime-picker-dialog-calendar);
+                };
+                @apply(--paper-datetime-picker-dialog-picker);
+            }
+            .paper-datetime-picker-dialog > paper-datetime-picker:not([narrow]) {
+                --paper-datetime-picker-heading: {
+                    @apply(--paper-datetime-picker-dialog-heading);
+                };
+            }
+
+        </style>
+    </template>
+</dom-module>

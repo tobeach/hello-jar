@@ -1,0 +1,885 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-media-query/iron-media-query.html">
+<link rel="import" href="../iron-resizable/iron-resizable-behavior.html">
+<link rel="import" href="../iron-selector/iron-selector.html">
+<link rel="import" href="../neon-animation/neon-animated-pages.html">
+<link rel="import" href="../neon-animation/neon-animatable.html">
+<link rel="import" href="../neon-animation/animations/fade-in-animation.html">
+<link rel="import" href="../neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../iron-media-query/iron-media-query.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../paper-styles/color.html">
+<link rel="import" href="../paper-styles/default-theme.html">
+<link rel="import" href="../paper-styles/shadow.html">
+<link rel="import" href="../paper-styles/typography.html">
+<link rel="import" href="../moment-element/moment-with-locales-import.html">
+<link rel="import" href="paper-clock-selector.html">
+<link rel="import" href="paper-datetime-picker-dialog-style.html">
+<link rel="import" href="paper-calendar.html">
+<link rel="import" href="paper-year-list.html">
+<link rel="import" href="paper-month-list.html">
+
+<!--
+
+[Material Design Pickers](http://www.google.com/design/spec/components/pickers.html)
+
+Provides a responsive time picker based on the material design spec. This
+component aims to be a clone of the time picker introduced in Android Lollipop.
+
+## Examples:
+
+Default picker:
+
+    <paper-time-picker></paper-time-picker>
+
+Setting the initial time to 4:20pm (note that hours given as 24-hour):
+
+    <paper-time-picker time="4:20pm"></paper-time-picker>
+
+If you include this element as part of `paper-dialog`, use the class
+`"paper-time-picker-dialog"` on the dialog in order to give it proper styling.
+
+    <paper-dialog id="dialog" modal class="paper-time-picker-dialog"
+      on-iron-overlay-closed="dismissDialog">
+      <paper-time-picker id="timePicker" time="[[time]]"></paper-time-picker>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm>OK</paper-button>
+      </div>
+    </paper-dialog>
+
+@element paper-time-picker
+@blurb Provides a responsive time picker based on the material design spec.
+@homepage http://bendavis78.github.io/paper-time-picker/
+@demo demo/index.html
+-->
+<style is="custom-style" include="paper-datetime-picker-dialog-style">
+    /* include dialog style at document-level for backward compatibility */
+</style>
+
+<dom-module id="paper-datetime-picker">
+    <template>
+        <style>
+             :host * {
+                -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            }
+
+             :host {
+                display: inline-block;
+                background-color: var(--primary-background-color);
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                @apply(--paper-font-body1);
+                font-size: 14px;
+                max-width: 100%;
+            }
+            /** Landscape ******************/
+
+            #datetimePicker {
+                width: 512px;
+                height: 304px;
+                @apply(--layout-horizontal);
+                @apply(--paper-time-picker);
+            }
+
+            #heading {
+                width: 180px;
+                padding: 16px 0 16px 10px;
+                height: 108%;
+                display: flex;
+                @apply(--layout-vertical);
+                @apply(--paper-time-picker-heading);
+            }
+
+            #valuePicker {
+                padding: 20px;
+            }
+
+            #heading .day {
+                letter-spacing: 0.2ex !important;
+            }
+            /** Narrow *********************/
+
+             :host([narrow]) #datetimePicker {
+                max-width: 100%;
+                max-height: 100%;
+                width: 328px;
+                height: 428px;
+                @apply(--layout-vertical);
+            }
+
+             :host([narrow]) #heading {
+                width: auto;
+                height: 96px;
+                padding: 0;
+                @apply(--layout-horizontal);
+                @apply(--layout-end-justified);
+            }
+
+             :host([narrow]) #heading .time {
+                margin-top: 6px;
+                font-size: 50px;
+                letter-spacing: 0.1ex !important;
+                padding-top: 25px;
+            }
+
+             :host([narrow]) #heading .date {
+                font-size: 40px;
+                padding-top: 15px;
+                margin-left: auto;
+            }
+
+             :host([narrow]) #heading .period {
+                margin-left: 12px;
+                margin-top: 12px;
+            }
+
+             :host([narrow]) #valuePicker {
+                padding: 30px 20px 10px;
+                @apply(--paper-time-picker-clock);
+            }
+
+             :host([isTouch]) paper-year-list::-webkit-scrollbar {
+                width: 0 !important;
+            }
+
+            @media screen and (max-width: 400px) {
+                 :host([narrow]) #heading {
+                    height: 70px;
+                }
+                 :host([narrow]) #datetimePicker #heading .year {
+                    font-size: 18px;
+                    line-height: 20px;
+                }
+                 :host([narrow]) #datetimePicker #heading .day {
+                    font-size: 20px;
+                    line-height: 20px;
+                }
+                 :host([narrow]) #datetimePicker #heading .date {
+                    padding-top: 0;
+                }
+                 :host([narrow]) #datetimePicker #heading .time {
+                    font-size: 30px;
+                    padding-top: 10px;
+                    width: auto;
+                }
+                 :host([narrow]) #datetimePicker {
+                    width: 288px;
+                    height: 350px;
+                }
+            }
+            /** Heading ********************/
+
+            #heading {
+                color: var(--light-primary-color);
+                background: var(--default-primary-color);
+                @apply(--layout-vertical);
+                @apply(--layout-center-center);
+            }
+
+            #heading>iron-selector {
+                margin-top: 10px;
+            }
+
+            #heading .time {
+                @apply(--paper-font-display2);
+                @apply(--layout-horizontal);
+                @apply(--layout-end-justified);
+            }
+
+            #heading.AM .AM,
+            #heading.PM .PM,
+            #heading.pg-date .day,
+            #heading.pg-hours .hours,
+            #heading.pg-minutes .minutes,
+            #heading.pg-year .year,
+            #heading.pg-months .day {
+                color: var(--text-primary-color);
+                font-weight: bold;
+            }
+
+            #heading .period {
+                font-weight: 600;
+                @apply(--paper-font-subhead);
+            }
+
+            #heading .day,
+            #heading .hours,
+            #heading .minutes,
+            #heading .period div,
+            #heading .time div,
+            #heading .year {
+                cursor: pointer;
+            }
+
+            #heading .date {
+                margin-right: auto;
+            }
+
+            #heading .time {
+                margin-right: auto;
+            }
+
+            #heading .hidden-true {
+                display: none;
+            }
+
+            #heading .day {
+                @apply(--paper-font-display1);
+                margin-top: 2px;
+                @apply(--paper-date-picker-heading-date);
+                font-size: 30px;
+            }
+
+            #heading .year {
+                @apply(--paper-font-body2);
+                font-size: 16px;
+                @apply(--paper-date-picker-heading-date);
+            }
+
+            #heading .period {
+                margin-left: 10px;
+            }
+
+            #pages {
+                @apply(--layout-flex);
+                width: auto;
+                background: var(--default-background-color);
+            }
+
+            #calendar {
+                --paper-calendar: {
+                    @apply(--paper-date-picker-calendar);
+                }
+            }
+            /** Clock *********************/
+
+            #valuePicker {
+                background: var(--default-background-color);
+                overflow: hidden;
+                @apply(--layout-flex);
+                @apply(--paper-time-picker-clock);
+                @apply(--layout-vertical);
+            }
+
+            #valuePicker>div {
+                @apply(--layout-flex);
+                position: relative;
+                left: 15px;
+            }
+
+            .clock {
+                @apply(--layout-fit);
+            }
+
+            .clock-animatable {
+                @apply(--layout-fit);
+            }
+
+            g.hide {
+                display: none;
+            }
+
+            paper-clock-selector {
+                height: 100%;
+            }
+        </style>
+        <iron-media-query query="{{_getMediaQuery(forceNarrow, responsiveWidth)}}" query-matches="{{_queryMatches}}"></iron-media-query>
+
+        <div id="datetimePicker">
+            <div id="heading" class$="{{_getHeadingClass('heading-content', _selectedPage)}} {{period}}" selectable="[name]" attr-for-selected="name" selected="{{view}}">
+                <div hidden$="{{nodate}}" class="date">
+                    <div class="year" on-tap="_tapHeadingYear" name="year">{{dateFormat(datetime, 'YYYY', locale)}}</div>
+                    <div class="day" on-tap="_tapHeadingDate" name="date">{{dateFormat(datetime, headingFormat, locale)}}
+                    </div>
+                </div>
+                <div class="time" hidden$="{{notime}}">
+                    <div name="hours" on-tap="_tapHeadingHour" class="hours">{{dateFormat(datetime, hourHeadingFormat, locale)}}</div>
+                    <div class="sep">:</div>
+                    <div name="minutes" on-tap="_tapHeadingMinute" class="minutes">{{dateFormat(datetime, 'mm', locale)}}</div>
+                    <div class="period" hidden$="{{format24}}">
+                        <div class="AM" name="AM" on-tap="_periodChanged">AM</div>
+                        <div class="PM" name="PM" on-tap="_periodChanged">PM</div>
+                    </div>
+                </div>
+            </div>
+            <neon-animated-pages id="pages" class$="{{_selectedPage}} fit" selected="{{_selectedPage}}" attr-for-selected="id" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
+                <neon-animatable id="date">
+                    <paper-calendar id="calendar" locale="{{locale}}" date="{{datetime}}" min-date="{{minDate}}" max-date="{{maxDate}}"></paper-calendar>
+                </neon-animatable>
+                <neon-animatable id="months">
+                    <paper-month-list id="monthList" locale="{{locale}}" on-tap="_tapHeadingDate" date="{{datetime}}" min="[[_minMonth]]" max="[[_maxMonth]]"></paper-month-list>
+                </neon-animatable>
+                <neon-animatable id="year">
+                    <paper-year-list id="yearList" date="{{datetime}}" on-tap="_tapHeadingDate" min="[[_minYear]]" max="[[_maxYear]]"></paper-year-list>
+                </neon-animatable>
+                <neon-animatable id="hours" class$="clock-animatable">
+                    <paper-clock-selector id="hourClock" count="{{hourFormat}}" step="1" animated="[[animated]]" selected="{{hour}}" narrow="[[narrow]]"></paper-clock-selector>
+                </neon-animatable>
+                <neon-animatable id="minutes" class$="clock-animatable">
+                    <paper-clock-selector id="minuteClock" count="60" step="5" animated="[[animated]]" use-zero zero-pad selected="{{minute}}" narrow="[[narrow]]"></paper-clock-selector>
+                </neon-animatable>
+            </neon-animated-pages>
+        </div>
+    </template>
+    <script>
+        (function() {
+            function warn() {
+                if (window.console) {
+                    console.warn.apply(console, arguments);
+                }
+            }
+            Polymer({
+                is: 'paper-datetime-picker',
+                properties: {
+                    format24: {
+                        type: Boolean,
+                        value: false
+                    },
+                    datetime: {
+                        type: Date,
+                        value: function() {
+                            var date = new Date();
+                            return date;
+                        },
+                        notify: true,
+                        observer: '_dateTimeChanged'
+                    },
+                    date: {
+                        type: Date,
+                        value: null
+                    },
+                    time: {
+                        type: String,
+                        value: '12:00'
+                    },
+                    /**
+                     * The selected time
+                     */
+                    notime: {
+                        type: Boolean,
+                        value: false
+                    },
+                    nodate: {
+                        type: Boolean,
+                        value: false
+                    },
+                    /**
+                     * Maximum screen width at which the picker uses a vertical layout
+                     */
+                    responsiveWidth: {
+                        type: String,
+                        value: '360px'
+                    },
+                    /**
+                     * The current locale
+                     */
+                    locale: {
+                        type: String,
+                        value: function() {
+                            var userLang = navigator.language || navigator.userLanguage;
+                            return userLang;
+                        }
+                    },
+                    /**
+                     * The format of the date displayed in the heading.
+                     * See docuemntation for Moment.js for more info.
+                     */
+                    headingFormat: {
+                        type: String,
+                        value: 'MMM D'
+                    },
+                    hourHeadingFormat: {
+                        type: String,
+                        value: 'HH'
+                    },
+                    /**
+                     * The minimum allowed date
+                     */
+                    minDate: {
+                        type: Date,
+                        value: null
+                    },
+                    /**
+                     * The maximum allowed date
+                     */
+                    maxDate: {
+                        type: Date,
+                        value: null
+                    },
+                    /**
+                     * Force narrow layout
+                     */
+                    forceNarrow: {
+                        type: Boolean,
+                        value: false
+                    },
+                    narrow: {
+                        type: Boolean,
+                        reflectToAttribute: true,
+                        notify: true,
+                        computed: '_computeNarrow(forceNarrow, _queryMatches)'
+                    },
+                    isTouch: {
+                        type: Boolean,
+                        value: false,
+                        readOnly: true,
+                        reflectToAttribute: true
+                    },
+                    _queryMatches: {
+                        type: Boolean,
+                        value: false
+                    },
+                    headingBreak: {
+                        type: String,
+                        value: '[,]'
+                    },
+                    _selectedPage: String,
+                    _maxYear: {
+                        type: Number,
+                        computed: '_getFullYear(maxDate)'
+                    },
+                    _minYear: {
+                        type: Number,
+                        computed: '_getFullYear(minDate)'
+                    },
+                    _maxMonth: {
+                        type: Number,
+                        computed: '_getFullMonth(maxDate)'
+                    },
+                    _minMonth: {
+                        type: Number,
+                        computed: '_getFullMonth(minDate)'
+                    },
+                    /**
+                     * The time value as the number of minutes from midnight
+                     */
+                    rawValue: {
+                        type: Number,
+                        value: 0,
+                        notify: true,
+                        observer: '_rawValueChanged'
+                    },
+                    /**
+                     * The current 24-hour value (0-24)
+                     */
+                    hour: {
+                        type: Number,
+                        observer: '_hourChanged',
+                        notify: true,
+                        value: 0
+                    },
+                    /**
+                     * The current 12-hour value (0-12)
+                     */
+                    hour12: {
+                        type: Number
+                    },
+                    /**
+                     * The current minute (0-59)
+                     */
+                    minute: {
+                        type: Number,
+                        notify: true,
+                        observer: '_minuteChanged',
+                        value: 0
+                    },
+                    /**
+                     * The current period ('AM', 'PM')
+                     */
+                    period: {
+                        type: String,
+                        notify: true,
+                        value: 'AM'
+                    },
+                    /**
+                     * The current selector view ('hours' or 'minutes')
+                     */
+                    view: {
+                        type: String,
+                        notify: true,
+                        value: 'date',
+                        observer: '_viewChanged'
+                    },
+                    /**
+                     * Maximum screen width at which the picker uses a vertical layout
+                     */
+                    responsiveWidth: {
+                        type: String,
+                        value: '560px'
+                    },
+                    /**
+                     * Force narrow layout
+                     */
+                    forceNarrow: {
+                        type: Boolean,
+                        value: false
+                    },
+                    /**
+                     * Whether or not to animate the clock hand between selections
+                     */
+                    animated: {
+                        type: Boolean,
+                        value: false
+                    },
+                    narrow: {
+                        type: Boolean,
+                        reflectToAttribute: true,
+                        value: false,
+                        notify: true
+                    },
+                    isTouch: {
+                        type: Boolean,
+                        value: false,
+                        reflectToAttribute: true
+                    },
+                    _queryMatches: {
+                        type: Boolean,
+                        value: false,
+                        observer: '_computeNarrow'
+                    },
+                    isReady: {
+                        type: Boolean,
+                        value: false
+                    }
+                },
+                behaviors: [Polymer.IronResizableBehavior],
+                listeners: {
+                    'iron-resize': '_resizeHandler',
+                    'paper-clock-selected': '_onClockSelected',
+                    'paper-date-selected': '_onDateSelected',
+                    'paper-switch-month': '_tapHeadingMonth',
+                    'paper-month-selected': '_'
+                },
+                ready: function() {
+                    this.isTouch = 'ontouchstart' in window;
+                    if (this.nodate) {
+                        this.view = 'hours';
+                    }
+                    if (this.locale === 'de') {
+                        this.format24 = true;
+                    } else {
+                        this.format24 = false;
+                    }
+                    if (this.format24) {
+                        this.hourFormat = 24;
+                        this.hourHeadingFormat = 'HH';
+                    } else {
+                        this.hourFormat = 12;
+                        this.hourHeadingFormat = 'h';
+                    }
+                    var parsed = this.parseTime(this.datetime);
+                    this.hour = parsed.hour;
+                    this.minute = parsed.minute;
+                    this.time = this.formatTime(parsed.hour, parsed.minute);
+                    this.rawValue = (parsed.hour * 60) + parsed.minute;
+                    this.isReady = true;
+                },
+                setDate: function(date) {
+                    this.datetime = date;
+                    this.hour = date.getHours();
+                    this.minute = date.getMinutes();
+                },
+                dateFormat: function() {
+                    var formatted = this.$.calendar.dateFormat.apply(this.$.calendar, arguments);
+                    return formatted;
+                },
+                _tapHeadingDate: function() {
+                    if (this.$.pages.selected !== 'date') {
+                        this._selectPage('date');
+                    } else {
+                        // tapping the date header while already viewing months brings you back
+                        // to the selected month
+                        this.$.calendar.currentMonth = this.date.getMonth() + 1;
+                        this.$.calendar.currentYear = this.date.getFullYear();
+                    }
+                },
+                _tapHeadingYear: function() {
+                    if (this.$.pages.selected !== 'year') {
+                        this._selectPage('year');
+                        this.$.yearList.centerSelected();
+                    }
+                },
+                _tapHeadingHour: function(value) {
+                    if (this.$.pages.selected !== 'hours') {
+                        this._selectPage('hours');
+                    }
+                },
+                _tapHeadingMinute: function() {
+                    if (this.$.pages.selected !== 'minutes') {
+                        this._selectPage('minutes');
+                    }
+                },
+                _tapHeadingMonth: function() {
+                    if (this.$.pages.selected !== 'months') {
+                        this._selectPage('months');
+                        this.$.monthList.centerSelected();
+                    }
+                },
+                _selectPage: function(page) {
+                    this.$.pages.selected = page;
+                    this.view = page;
+                },
+                _getFullYear: function(date) {
+                    return date ?
+                        date.getFullYear() :
+                        null;
+                },
+                _getFullMonth: function(date) {
+                    return date ? date.getMonth() : null;
+                },
+                _splitHeadingDate: function(date, format, locale) {
+                    var re = new RegExp(this.headingBreak, 'g');
+                    var text = this.dateFormat(date, format, locale);
+                    var seps = text.match(re);
+                    var value;
+                    if (!seps) {
+                        value = [text];
+                    } else {
+                        value = text.split(re).map(function(s, i) {
+                            return s + (seps[i] || '');
+                        });
+                    }
+                    return value;
+                },
+                _dateTimeChanged: function(dateTime) {
+                    if (!dateTime) {
+                        this.rawValue = 0;
+                        return;
+                    } {
+                        this.date = dateTime;
+                    }
+                },
+                _updateTime: function(hour, minute) {
+                    this.rawValue = (hour * 60) + minute;
+                },
+                formatTime: function(hour, minute) {
+                    var period = (hour % 24) < 12 ?
+                        'AM' :
+                        'PM';
+                    if (!this.format24) {
+                        hour = hour % 12 || 12;
+                        minute = ('0' + minute).substr(-2);
+                        return hour + ':' + minute + ' ' + period;
+                    } else {
+                        return hour + ':' + minute;
+                    }
+                },
+                parseTime: function(datetime) {
+                    var date = new Date();
+                    var hour = date.getHours();
+                    var minute = date.getMinutes();
+                    if (datetime && datetime instanceof Date) {
+                        hour = datetime.getHours();
+                        minute = datetime.getMinutes();
+                    }
+                    return {
+                        hour: hour,
+                        minute: minute
+                    };
+                },
+                togglePeriod: function() {
+                    this.period = (this.period === 'AM') ?
+                        'PM' :
+                        'AM';
+                },
+                _rawValueChanged: function(value, oldValue) {
+                    if (isNaN(parseInt(value))) {
+                        this.rawValue = oldValue;
+                        return;
+                    }
+                },
+                _hour12Changed: function(hour12) {
+                    var add = (this.period === 'PM' ?
+                        12 :
+                        0);
+                },
+                _hourChanged: function(hour, oldVaue) {
+                    if (this.isReady) {
+                        hour = parseInt(hour);
+                        if (isNaN(hour) && !hour) {
+                            return;
+                        }
+                        if (isNaN(hour)) {
+                            warn('Invalid number:', hour);
+                            this.hour = oldVaue;
+                            return;
+                        }
+                        hour = parseFloat(hour) % 24;
+                        if (hour < 10 && this.format24) {
+                            hour = "0" + hour;
+                        }
+                        this.hour12 = this._twelveHour(hour);
+                        this.datetime.setHours(hour);
+                        this.time = this.formatTime(hour, this.minute);
+                    }
+                },
+                _minuteChanged: function(minute) {
+                    if (this.isReady) {
+                        minute = parseFloat(minute) % 60;
+                        this.minute = minute;
+                        this.datetime.setMinutes(minute);
+                        this.time = this.formatTime(this.hour, minute);
+                    }
+                },
+                _periodChanged: function(period) {
+                    if (isNaN(parseInt(this.hour)) || isNaN(parseInt(this.minute))) {
+                        return;
+                    }
+                    if (this.format24) {
+                        return;
+                    }
+                    if (period.srcElement.innerText === 'AM') {
+                        this.period = period.srcElement.innerText;
+                        if (this.hour >= 12) {
+                            var hour = this.hour - 12;
+                            this._hourChanged(hour);
+                        }
+                    } else if (period.srcElement.innerText === 'PM') {
+                        this.period = period.srcElement.innerText;
+                        if (this.hour < 12) {
+                            var hour = this.hour + 12;
+                            this._hourChanged(hour);
+                        }
+                    }
+                },
+                _zeroPad: function(value, length) {
+                    if (value === undefined || isNaN(value) || isNaN(length)) {
+                        return;
+                    }
+                    return ('0' + value).substr(-length);
+                },
+                _twelveHour: function(hour) {
+                    return hour % 12 || 12;
+                },
+                _isEqual: function(a, b) {
+                    return a === b;
+                },
+                _getMediaQuery: function(forceNarrow, responsiveWidth) {
+                    return '(max-width: ' + (forceNarrow ?
+                        '' :
+                        responsiveWidth) + ')';
+                },
+                _computeNarrow: function() {
+                    this.set('narrow', this._queryMatches || this.forceNarrow);
+                },
+                _viewChanged: function(toView, fromView) {
+                    this.$.pages._notifyPageResize();
+                    switch (toView) {
+                        case 'date':
+                            this._tapHeadingDate();
+                            return;
+                            break;
+                        case 'year':
+                            this._tapHeadingYear();
+                            return;
+                            break;
+                        case 'hours':
+                            this._tapHeadingHour();
+                            break;
+                        case 'minutes':
+                            this._tapHeadingMinute();
+                            break;
+                        case 'months':
+                            this._tapHeadingMonth();
+                            return;
+                            break;
+                        default:
+                            this._tapHeadingDate();
+                    }
+                    // prevent the clock-hand transition when selecting, otherwise the extra movement would be confusing
+                    if (this._selecting || !fromView || !toView || !this.animated) {
+                        return;
+                    }
+                    var clocks = {
+                        'hours': this.$.hourClock,
+                        'minutes': this.$.minuteClock
+                    };
+                    var from = clocks[fromView];
+                    if (fromView.indexOf('date') >= 0 || fromView.indexOf('year') >= 0) {
+                        from = clocks['hours'];
+                    }
+                    var to = clocks[toView];
+                    var fromAngle = (360 / from.count) * from.selected;
+                    if (from.count == 24) {
+                        fromAngle = (360 / (from.count / 2)) * from.selected;
+                    }
+                    var toAngle = (360 / to.count) * to.selected;
+                    if (to.count == 24) {
+                        var toAngle = (360 / (to.count / 2)) * to.selected;
+                    }
+                    // transition both clock hands at the same time
+                    to.setClockHand(fromAngle, false);
+                    from.setClockHand(toAngle);
+                    this.async(function() {
+                        to.setClockHand(toAngle, true, function() {
+                            this.async(function() {
+                                from.setClockHand(fromAngle, false);
+                            }, 200);
+                        }.bind(this));
+                    }.bind(this));
+                },
+                _onClockSelected: function(event) {
+                    if (this.view === 'hours') {
+                        var showMinutes = function() {
+                            this.async(function() {
+                                this._selecting = true;
+                                this.view = 'minutes';
+                                this._selecting = false;
+                            }.bind(this), 100);
+                            this.$.hourClock.removeEventListener('paper-clock-transition-end', showMinutes);
+                        }.bind(this);
+                        if (event.detail.animated) {
+                            this.$.hourClock.addEventListener('paper-clock-transition-end', showMinutes);
+                        } else {
+                            showMinutes();
+                        }
+                        if (this.hour12 !== event.detail.value) {
+                            this.hour12 = event.detail.value;
+                        }
+                        showMinutes();
+                    }
+                    var newDatetime = new Date(this.datetime);
+                    newDatetime.setMinutes(this.minute);
+                    if (this.hour === 24) {
+                        newDatetime.setDate(newDatetime.getDate() - 1);
+                    }
+                    newDatetime.setHours(this.hour);
+                    this.datetime = newDatetime;
+                },
+                _onDateSelected: function() {
+                    if (!this.notime) {
+                        this._tapHeadingHour();
+                    } else {
+                        this.datetime.setHours(0, 0, 0, 0);
+                    }
+                },
+                _resizeHandler: function() {
+                    if (!this.offsetWidth && this.$.pages.selected !== 'date') {
+                        this._selectPage('date');
+                    }
+                    if (!this.offsetWidth || this._resizing) {
+                        return;
+                    }
+                    this.updateStyles();
+                    this.async(function() {
+                        this._resizing = true;
+                        this.$.pages._notifyPageResize();
+                        this._resizing = false;
+                    }.bind(this));
+                },
+                _pageSelected: function() {
+                    this._resizeHandler();
+                },
+                _getHeadingClass: function(pfx, selectedPage) {
+                    return pfx + ' pg-' + selectedPage;
+                }
+            });
+        })();
+    </script>
+</dom-module>
