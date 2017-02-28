@@ -1,0 +1,132 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+
+<dom-module id="tt-sign-tag">
+    <template>
+        <style>
+            :host {
+                width:                  90%;
+                display:                flex;        
+                flex-direction:         column;              
+                align-content:          center;           
+                align-items:            center; 
+                justify-content:        flex-start;               
+                display:                -webkit-flex;
+                -webkit-flex-direction: column;      
+                -webkit-align-content:  center; 
+                -webkit-align-items:    center;
+                -webkit-justify-content:flex-start;                           
+            }
+            /*
+            :host(:hover) {
+                opacity: .1;
+            }
+            */
+            .sign-container {
+                margin-top: 20px; 
+                border-radius: 5px; 
+                width: 100%; 
+                height: 400px;
+            }
+            .sign-area {
+                width: 90%;
+                display:                flex;        
+                flex-direction:         column;              
+                align-content:          center;           
+                align-items:            center; 
+                justify-content:        flex-start;               
+                display:                -webkit-flex;
+                -webkit-flex-direction: column;      
+                -webkit-align-content:  center; 
+                -webkit-align-items:    center;
+                -webkit-justify-content:flex-start;           
+                /*
+                width:                  var(--map-width, 200px);
+                height:                 var(--map-height, 200px);
+                margin-top:            20px; 
+                */
+            }
+            
+            .sign-button {
+                background-color:  var(--paper-orange-700); 
+                color: white;
+                width: 100px;
+                margin: auto;
+            }
+
+        </style>
+
+        <paper-material class="sign-container" elevation="1">  
+        <br>
+        <div style="width: 100%; display: flex; display: -webkit-flex; -webkit-flex-direction: column;
+            flex-direction: column; justify-content: center">
+            <div style="text-align: center; width: 40%; margin: auto;">
+                <b>Your Bittag contract is saved, and ready for you to sign.</b>
+            </div>
+            <br><br>            
+            <div style="text-align: justify; width: 70%; margin: auto;">
+                To sign your saved contract, you must text a security code from this phone to bittag. The message will be automatically filled
+                out for you by pressing the 'SEND TXT' button bellow. After you have sent the text, return to this screen to view the created
+                bittag link that you can share with clients.
+            </div>
+            <br><br>            
+            <paper-fab id="closeSignTagButton" on-tap="closeSignTag" style="position: absolute; top: 5px; right: 5px;" icon="close"></paper-fab>            
+                <paper-button class="sign-button" on-click="sendTxt" raised>SEND TXT</paper-icon-button>
+        </div>
+        </paper-material>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'tt-sign-tag',
+
+            properties: {
+                authorPin: {
+                    type: String,
+                    value: "XYZ",
+                    reflectToAttribute: true,
+                },
+                txtCallBackNumber: {
+                    type: String,
+                    value: "15556661212",
+                    reflectToAttribute: true,
+                }
+            },
+            
+            created: function() {
+                //alert("created, name:" + this.name);
+                //alert("lat:" + this.lat);
+            },
+            
+            closeSignTag: function() {
+                //this.lat =  this.$$('#meetingMarker').latitude;
+                //this.lng =  this.$$('#meetingMarker').longitude;
+                this.parent.closeSignTag();
+            },
+
+            sendTxt: function() {
+                //alert("authorPin:" + this.authorPin + " txtCallBackNumber:" + this.txtCallBackNumber);
+                location.href = "sms:" + this.txtCallBackNumber + ";?&body=" + this.authorPin;
+                //location.href='sms:14378000584;?&body=1234';
+                // old java twilio GET:  http://1-dot-bittagdemo.appspot.com//ServerTwilio?
+                // old java twilio POST: http://1-dot-bittagtest.appspot.com//tt_viewTag?tagId=5698390272770048
+            },
+            
+        });
+    </script>        
+
+    
+</dom-module>>

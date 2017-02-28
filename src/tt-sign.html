@@ -1,0 +1,160 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="tt-app-styles.html">
+
+<dom-module id="tt-sign">
+    <template>
+        <style include="tt-app-styles">
+            :host {
+                width:                  100%;
+                display:                flex;        
+                flex-direction:         column;              
+                align-content:          center;           
+                align-items:            center; 
+                justify-content:        flex-start;               
+                display:                -webkit-flex;
+                -webkit-flex-direction: column;      
+                -webkit-align-content:  center; 
+                -webkit-align-items:    center;
+                -webkit-justify-content:flex-start;                           
+            }
+            .sign-container {
+                margin-top: 20px; 
+                border-radius: 5px; 
+                width: 100%; 
+                height: 340px;
+            }
+            .sign-area {
+                width: 90%;
+                display:                flex;        
+                flex-direction:         column;              
+                align-content:          center;           
+                align-items:            center; 
+                justify-content:        flex-start;               
+                display:                -webkit-flex;
+                -webkit-flex-direction: column;      
+                -webkit-align-content:  center; 
+                -webkit-align-items:    center;
+                -webkit-justify-content:flex-start;           
+                /*
+                width:                  var(--map-width, 200px);
+                height:                 var(--map-height, 200px);
+                margin-top:            20px; 
+                */
+            }
+            
+            .sign-button {
+                width: 100px;
+                margin: auto;
+            }
+
+        </style>
+
+
+        <div style="width: 90%; display: flex; display: -webkit-flex; -webkit-flex-direction: column;
+            flex-direction: column; justify-content: center">
+
+            <paper-material class="sign-container" elevation="1">  
+            <br>
+            <div style="width: 100%; display: flex; display: -webkit-flex; -webkit-flex-direction: column;
+                flex-direction: column; justify-content: center">
+                <div style="text-align: center; width: 60%; margin: auto;">
+                    <b>Your bittag contract is ready for you to sign.</b>
+                </div>
+                <br>
+                <div style="text-align: justify; width: 80%; margin: auto;">
+                    A text-code has been sent to the mobile phone of the tag author. Enter the code bellow and 
+                    press 'SIGN TAG' to create a secure bittag meeting request link that can be shared with anyone.
+                    <br><br>
+                    <div style="text-align: center; margin: auto;"><b>Enter 4-digit code:</b></div>
+                    <paper-input type="tel" style="text-align: center; width: 60px; margin: auto;" id="signtag-code" placeholder="code" maxlength="4"></paper-input>
+                    <paper-tooltip for="signtag-code"        offset="0">Enter text-message code.</paper-tooltip>                       
+                </div>
+                <paper-fab id="closeSignTagButton" on-tap="closeSignTag" style="position: absolute; top: 5px; right: 5px; background-color:#bdbdbd;" icon="close"></paper-fab>            
+            </div>
+            </paper-material>
+            <br>
+            <paper-button class="sign-button" on-click="signTag" raised>SIGN TAG</paper-icon-button>            
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'tt-sign',
+
+            properties: {
+                page: {
+                    type: String,
+                    notify: true
+                }  
+
+                /*******
+                // Note: An alternative to waiting for, and entering a txt code, is to send a txt 
+                // from the client to a twilio number with a unique pin for the tag to be activated.
+                // ex: "sendSignature"(resp.authorPin, resp.txtCallBackNumber);                                
+                authorPin: {
+                    type: String,
+                    value: "XYZ",
+                    reflectToAttribute: true,
+                },
+                txtCallBackNumber: {
+                    type: String,
+                    value: "15556661212",
+                    reflectToAttribute: true,
+                }
+                ********/
+            },
+            
+            signTag: function() {            
+                let mythis = this;
+                tt.signTag(this).then(function(response) {
+                    console.log("saveTag success. response:", response);
+                    let reply = new Object();
+                    reply = JSON.parse(response);
+                    mythis.workingTag = reply.data.ttTag;
+                    mythis.notifyPath('workingTag.isAuthorSigned'); 
+                    if( reply.rc == 0 )
+                        mythis.page = "show";   // The code matched. Show the tag.
+                    else
+                        mythis.page = "make";   // The code did not match. ##!! TODO: send user to a re-try screen.
+                }, function(error) {
+                    console.error("Failed!", error);
+                    mythis.page = "make";       // The call failed. ##!! TODO: send user to a re-try screen.
+                })            
+            },
+            
+            closeSignTag: function() {
+                this.page = "make";
+            }            
+
+            /*******
+            // Note: An alternative to waiting for, and entering a txt code, is to send a txt 
+            // from the client to a twilio number with a unique pin for the tag to be activated.
+            // ex: "sendSignature"(resp.authorPin, resp.txtCallBackNumber);                
+            sendTxt: function() {
+                //alert("authorPin:" + this.authorPin + " txtCallBackNumber:" + this.txtCallBackNumber);
+                location.href = "sms:" + this.txtCallBackNumber + ";?&body=" + this.authorPin;
+                //location.href='sms:14378000584;?&body=1234';
+                // old java twilio GET:  http://1-dot-bittagdemo.appspot.com//ServerTwilio?
+                // old java twilio POST: http://1-dot-bittagtest.appspot.com//tt_viewTag?tagId=5698390272770048
+            },
+            ********/            
+        });
+    </script>        
+
+    
+</dom-module>>

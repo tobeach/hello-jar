@@ -1,0 +1,311 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-drawer-panel/paper-drawer-panel.html">
+<link rel="import" href="../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+
+<link rel="import" href="../bower_components/gold-phone-input/gold-phone-input.html">
+
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../bower_components/iron-autogrow-textarea/iron-autogrow-textarea.html">
+
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<!--link rel="import" href="../bower_components/mn-paper-datetime-picker/mn-paper-datetime-picker.html"-->
+
+<link rel="import" href="tt-app-styles.html">
+<link rel="import" href="./tt-make.html">
+<link rel="import" href="./tt-map.html">
+<link rel="import" href="./tt-sign.html">
+<link rel="import" href="./tt-show.html">
+<link rel="import" href="./tt-list.html">
+<link rel="import" href="./tt-datetime.html">
+
+<dom-module id="tt-app">
+
+    <template>        
+        <style include="tt-app-styles">
+            #paperDrawerPanel [main] {
+                text-align: left;
+                background-color: var(--paper-grey-100);
+            }
+            #paperDrawerPanel [drawer] {
+                border-right: 1px solid var(--paper-grey-300);
+            }
+            #paperDrawerPanel[right-drawer] [drawer] {
+                border-left: 1px solid var(--paper-grey-300);
+            }
+            .toolbar-bittag-logo {
+                padding-left:   0px; 
+                margin-left:    0px;
+                padding-top:    0;
+                height:         40px;
+                width:          120px;
+                vertical-align: middle;
+                white-space:    nowrap;
+            }
+            .menu-bittag-logo {
+                width:50px; height:50px; display:-webkit-flex; display:flex; margin:auto;
+            }
+            .menu-icon { 
+                color:  white;
+                padding:        0px;
+                margin-right:   0px;
+                width:          30px;
+                height:         35px;
+                text-align:     left;
+            }            
+        </style>
+
+        <app-location route="{{route}}"></app-location>
+        <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{tabRoute}}"></app-route>        
+        <!-- app-route route="{{route}}" pattern="/tag/:tid" data="{{tagid}}" tail="{{tagRoute}}"></app-route-->        
+
+        <paper-drawer-panel id="paperDrawerPanel" force-narrow> 
+            
+            <paper-header-panel drawer>
+                <paper-toolbar>
+                    <iron-icon class="menu-bittag-logo" src="ttLogoWhite666.png"></iron-icon>                    
+                </paper-toolbar>
+                <div style="padding-bottom: 0px;margin-bottom: 0px">
+                <paper-menu style="padding-bottom: 0px;margin-bottom: 0px" selected="{{page}}" attr-for-selected="name">                            
+                    <!--paper-item name="make">Make a Tag</paper-item>
+                    <paper-item name="list">List Tags</paper-item-->                                        
+                    <template is="dom-repeat" items="{{items}}">
+                        <paper-item name="{{item.page}}">{{item.label}}</paper-item>
+                    </template>                            
+                </paper-menu>
+                </div>
+            </paper-header-panel>
+
+            <paper-header-panel main>
+                <paper-toolbar>
+                    <div style="display: inline-flex; width: 100%">
+                        <paper-icon-button class="menu-icon" icon="menu" paper-drawer-toggle></paper-icon-button>
+                        <iron-icon class="toolbar-bittag-logo" src="lcBittagNameWhite900x300.png"></iron-icon>
+                        <div style="align-self: flex-end">Blind trust.</div>
+                        <!-- tag:{{tagid.tid}} tail.path:{{tagRoute.path}} tail.prefix:{{tagRoute.prefix}} -->
+                        <!--                        
+                            real-time trust.
+                            secure disposable chat
+                            catching the other shoe.
+                            consequences.
+                            better behaviour
+                            better choices
+                            private telecom
+                            telecomunication
+                            Blind communication 
+                            Just show up.
+                            Just be there.
+                            Be there.
+                            Behavior through design
+                            Punctuality by design.
+                            RSVPs you can trust.
+                            RSVPs with a promise.
+                            RSVPs with promises.
+                        -->
+                        <!--div style="margin:auto; font-size:16px">
+                                MAKE TAG
+                        </div-->
+                    </div>
+                </paper-toolbar>
+
+                <iron-pages selected="{{page}}" attr-for-selected="name" fallback-selection="404" role="main">
+                    <tt-make        name="make"     page="{{page}}" working-tag="{{workingTag}}" author-mobile="{{mobile}}"></tt-make>
+                    <tt-map         name="map"      page="{{page}}" working-tag="{{workingTag}}"></tt-map>
+                    <tt-sign        name="sign"     page="{{page}}" working-tag="{{workingTag}}"></tt-sign>
+                    <tt-show        name="show"     page="{{page}}" working-tag="{{workingTag}}"></tt-show>
+                    <tt-list        name="list"     page="{{page}}"></tt-list>                    
+                    <tt-404     name="404"></tt-404>                    
+                    <!--tt-make    name="make"     route="{{tabRoute}}"></tt-make>
+                    <tt-list    name="list"     route="{{tabRoute}}"></tt-list>
+                    <tt-404     name="404"></tt-404-->
+                </iron-pages>
+
+                <!--tt-make></tt-make-->
+
+            </paper-header-panel>
+        </paper-drawer-panel>
+    </template>
+
+        <template id="map-template">
+        <div>
+            <paper-material style="align-self: center; width: 100%; position: absolute; z-index: 0; visibility: hidden;" elevation="1" animated id="map">renvevous location
+                <paper-button on-click="closeMap">CLOSE MAP</paper-button>                            
+            </paper-material>
+        </div>
+    </template>
+
+    <script src="./built/ttbundle.js"></script>
+
+    <script>
+        
+        Polymer({
+        is: 'tt-app',
+
+        properties: {
+            page: {
+                type: String,
+                notify: true,
+                reflectToAttribute: true,
+                observer: '_pageChanged'
+            },
+            workingTag: {
+                type:   Object,                                   
+                notify: true
+            },
+            authorMobile: {
+                type: String,
+                notify: true
+            },                                    
+            latitude: {
+                type: String,
+                notify: true
+            },
+            longitude: {
+                type: String,
+                notify: true
+            },
+            
+            tagFragment: {
+                type: HTMLElement,
+                value: null
+            },
+            items: {
+                type: Array,
+                value: function() {
+                    return  [
+                                {label: "MAKE TAG",     page: "make"},
+                                {label: "LIST TAGS",    page: "list"}
+                            ];
+                }            
+            },
+            currentOpenDrawer: {
+                type: String,
+                value: '#drawer1'
+            },
+            currentOpenDrawerIcon: {
+                type: String,
+                value: '#icon1'
+            },
+        },
+
+        attached: function() {
+            var now = new Date();
+            var isoStr  = now.toISOString();    // '2017-01-20T14:50:21.281Z'
+            var isoDate = isoStr.slice(0,10);   // '2017-01-20'
+            var isoTime = isoStr.slice(11,16);  // '14:50'
+            console.log("tt-app has attached at isoDate:" + isoDate + " isoTime:" + isoTime);            
+            // console.log("app route:" + JSON.stringify(this.route));
+            // console.log("app routeData:" + JSON.stringify(this.routeData));            
+        },
+
+        observers: [
+            '_routePageChanged(routeData.page)'
+        ],
+
+        _routePageChanged: function(page) {            
+            this.page = page || 'make';
+        },
+
+        _pageChanged: function(page) {
+
+            if( this.workingTag == undefined ) {
+                this.workingTag = tt.newTag();
+
+                // We now add a default to blank subjects at ttApi.makeTag().
+                // this.workingTag.subject = "My meeting";
+                // this.notifyPath('workingTag.subject'); 
+
+                // If markerLocation has not been set, set it to the user's current location.
+                var mythis = this;
+                if( mythis.workingTag.markerLocation.latitude == 0 ) {
+
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function(position) {
+                            var locationMarker = null;
+                            if (locationMarker){
+                                // return if there is a locationMarker bug
+                                return;
+                            }
+                            mythis.workingTag.markerLocation.latitude     = position.coords["latitude"];
+                            mythis.notifyPath('workingTag.markerLocation.latitude'); 
+                            mythis.workingTag.markerLocation.longitude    = position.coords["longitude"];
+                            mythis.notifyPath('workingTag.markerLocation.longitude'); 
+                            console.log("tt-make registered lat:" + mythis.workingTag.markerLocation.latitude + " lng:" + mythis.workingTag.markerLocation.longitude)
+                            // need to store extra lat/lng in case the user wants to cancel the map and keep the original pin location.
+                            mythis.workingTag.startingLat = mythis.workingTag.markerLocation.latitude;
+                            mythis.workingTag.startingLng = mythis.workingTag.markerLocation.longitude;
+                            },
+                            function(error) {
+                                console.log("Error: ", error);
+                            },
+                            {
+                                enableHighAccuracy: true
+                            }
+                        );
+                    }                
+                }            
+                // Load page import on demand. Show 404 page if fails
+                var resolvedPageUrl = this.resolveUrl('tt-' + page + '.html');
+                this.importHref(resolvedPageUrl, null, this._showPage404, true);
+            }
+        },
+
+        _showPage404: function() {
+            this.page = '404';
+        }
+        });
+
+        document.addEventListener('WebComponentsReady', function() {
+            a1.addEventListener('click', _onTap);
+            a2.addEventListener('click', _onTap);
+        });
+
+        function _onTap(e) {
+            var target = e.target;
+            if (!target.down) {
+            target.elevation += 1;
+            if (target.elevation === 5) {
+                target.down = true;
+            }
+            } else {
+            target.elevation -= 1;
+            if (target.elevation === 0) {
+                target.down = false;
+            }
+            }
+        };
+
+    </script>
+
+</dom-module>

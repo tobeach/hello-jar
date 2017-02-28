@@ -1,0 +1,171 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/google-map/google-map.html">
+
+<link rel="import" href="tt-app-styles.html">
+
+<dom-module id="tt-map">
+    <template>
+        <style include="tt-app-styles">
+            :host {
+                width:                  100%;
+                display:                flex;        
+                flex-direction:         column;              
+                align-content:          center;           
+                align-items:            center; 
+                justify-content:        flex-start;               
+                display:                -webkit-flex;
+                -webkit-flex-direction: column;      
+                -webkit-align-content:  center; 
+                -webkit-align-items:    center;
+                -webkit-justify-content:flex-start;                           
+            }
+            tt-map::shadow google-map {
+                height: 100%;
+                width: 100%;
+            }
+            .map-container {
+                margin-top: 20px; 
+                border-radius: 5px; 
+                width: 100%; 
+                height: 400px;
+            }
+            .map-area {
+                width: 90%;
+                display:                flex;        
+                flex-direction:         column;              
+                align-content:          center;           
+                align-items:            center; 
+                justify-content:        flex-start;               
+                display:                -webkit-flex;
+                -webkit-flex-direction: column;      
+                -webkit-align-content:  center; 
+                -webkit-align-items:    center;
+                -webkit-justify-content:flex-start;           
+                /*
+                width:                  var(--map-width, 200px);
+                height:                 var(--map-height, 200px);
+                margin-top:            20px; 
+                */
+            }
+            
+        </style>
+
+        <!--paper-material class="map-container" elevation="1">  
+            <!!google-map fit-to-markers latitude="37.77493" longitude="-122.41942" api-key="AIzaSyDB5ZPacuZn_tCgquF6uBcR7EN6el9bM_U">
+                <google-map-marker draggable="true" latitude="37.779" longitude="-122.3892" title="Meeting location">
+                </google-map-marker>                                
+            </google-map!!>
+            <google-map id="map" fit-to-markers api-key="AIzaSyDB5ZPacuZn_tCgquF6uBcR7EN6el9bM_U">
+                <!!google-map-marker id=meetingMarker draggable="true" latitude="37.779" longitude="-122.3892" title="Meeting location"!!>
+                <google-map-marker id=meetingMarker draggable="true" latitude={{workingTag.markerLocation.latitude}} longitude={{workingTag.markerLocation.longitude}} title="Meeting location">
+                </google-map-marker>                                
+            </google-map>            
+            <paper-fab id="closeMapButton" on-tap="closeMap" style="position: absolute; top: 5px; right: 5px;" icon="close"></paper-fab>
+            <br><br>
+            <paper-button class="sign-button" on-click="signTag" raised>SIGN TAG</paper-icon-button>
+        </paper-material-->
+        
+
+        <div style="width: 90%; display: flex; display: -webkit-flex; -webkit-flex-direction: column;
+            flex-direction: column; justify-content: center">
+
+            <paper-material class="map-container" elevation="1">              
+                <google-map id="map" fit-to-markers api-key="AIzaSyDB5ZPacuZn_tCgquF6uBcR7EN6el9bM_U">
+                    <google-map-marker id=meetingMarker draggable="true" latitude={{workingTag.markerLocation.latitude}} longitude={{workingTag.markerLocation.longitude}} title="Meeting location">
+                    </google-map-marker>                                
+                </google-map>                    
+                <paper-fab id="closeMapButton" on-tap="closeMap" style="position: absolute; top: 5px; right: 5px;background-color:#bdbdbd;" icon="close"></paper-fab>
+                <div style="text-align: center; width: 80%; margin: auto;">
+                    <br>
+                    <b>Drag pin to the meeting location.</b>
+                </div>
+
+                <br>
+                <div style="text-align: center; width: 80%; margin: auto;">
+                    <paper-button class="save-button" on-click="saveMarker" raised>SAVE LOCATION</paper-icon-button>
+                </div>
+            </paper-material>
+        </div>
+
+    </template>
+
+
+        <!--paper-material class="sign-container" elevation="1">  
+        <br>
+        <div style="width: 100%; display: flex; display: -webkit-flex; -webkit-flex-direction: column;
+            flex-direction: column; justify-content: center">
+            <div style="text-align: center; width: 60%; margin: auto;">
+                <b>Your bittag contract is saved, and ready for you to sign.</b>
+            </div>
+            <br><br>            
+            <div style="text-align: justify; width: 80%; margin: auto;">
+                A text-code has been sent to your (tag author) mobile phone. Enter the code bellow, and press
+                'SIGN TAG' to create the bittag link that you can then share with your clients.
+                <br>
+                <paper-input style="text-align: center; width: 60px; margin: auto;" id="signtag-code"  label="code" maxlength="4"></paper-input>
+                <paper-tooltip for="signtag-code"        offset="0">Enter text-message code.</paper-tooltip>                       
+            </div>
+            <br><br>
+            <paper-fab id="closeSignTagButton" on-tap="closeSignTag" style="position: absolute; top: 5px; right: 5px;" icon="close"></paper-fab>            
+            <paper-button class="sign-button" on-click="signTag" raised>SIGN TAG</paper-icon-button>
+        </div>
+        </paper-material-->
+
+
+
+    <script>
+        Polymer({
+            is: 'tt-map',
+
+            properties: {
+                page: {
+                    type: String,
+                    notify: true
+                },               
+                workingTag: {
+                    type:   Object,                                   
+                    notify: true
+                },
+                latitude: {
+                    type: String,
+                    notify: true
+                },
+                longitude: {
+                    type: String,
+                    notify: true
+                }
+            },
+            
+            closeMap: function() {
+                this.workingTag.markerLocation.latitude  = this.workingTag.startingLat;
+                this.notifyPath('workingTag.markerLocation.latitude'); 
+                this.workingTag.markerLocation.longitude = this.workingTag.startingLng;                
+                this.notifyPath('workingTag.markerLocation.longitude'); 
+                this.page = "make";
+            },
+
+            saveMarker: function() {  
+                this.workingTag.startingLat = this.workingTag.markerLocation.latitude;
+                this.workingTag.startingLng = this.workingTag.markerLocation.longitude;
+                this.page = "make";
+            },
+                
+        });
+    </script>        
+
+    
+</dom-module>>

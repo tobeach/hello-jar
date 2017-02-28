@@ -1,0 +1,132 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="tt-app-styles.html">
+
+<dom-module id="tt-show">
+    <template>
+        <style include="tt-app-styles">
+            :host {
+                width:                  100%;
+                display:                flex;        
+                flex-direction:         column;              
+                align-content:          center;           
+                align-items:            center; 
+                justify-content:        flex-start;               
+                display:                -webkit-flex;
+                -webkit-flex-direction: column;      
+                -webkit-align-content:  center; 
+                -webkit-align-items:    center;
+                -webkit-justify-content:flex-start;                           
+            }
+            .sign-container {
+                margin-top: 20px; 
+                border-radius: 5px; 
+                width: 100%; 
+                height: 340px;
+            }
+            .sign-area {
+                width: 90%;
+                display:                flex;        
+                flex-direction:         column;              
+                align-content:          center;           
+                align-items:            center; 
+                justify-content:        flex-start;               
+                display:                -webkit-flex;
+                -webkit-flex-direction: column;      
+                -webkit-align-content:  center; 
+                -webkit-align-items:    center;
+                -webkit-justify-content:flex-start;           
+                /*
+                width:                  var(--map-width, 200px);
+                height:                 var(--map-height, 200px);
+                margin-top:            20px; 
+                */
+            }
+            
+            .sign-button {
+                width: 100px;
+                margin: auto;
+            }
+
+        </style>
+
+
+        <div style="width: 90%; display: flex; display: -webkit-flex; -webkit-flex-direction: column;
+            flex-direction: column; justify-content: center">
+
+            <paper-material class="sign-container" elevation="1">  
+            <br>
+            <div style="width: 100%; display: flex; display: -webkit-flex; -webkit-flex-direction: column;
+                flex-direction: column; justify-content: center">
+                <div style="text-align: center; width: 60%; margin: auto;">
+                    <b>Your meeting request bittag link is:</b><br>
+                    {{workingTag.tagUrl}}<br>
+                </div>
+                <br>
+                <div style="text-align: justify; width: 80%; margin: auto;">                    
+                    subject: {{workingTag.subject}}<br>
+                    clientPenalty: ${{workingTag.clientPenalty}}   clientReward: ${{workingTag.clientReward}}<br>
+                    authorPenalty: ${{workingTag.authorPenalty}}   authorReward: ${{workingTag.authorReward}}<br>
+                    time: {{workingTag.tmMeetingStart}}<br>
+                    length: {{workingTag.meetingLenSecs}}<br>
+                    location lat:{{workingTag.markerLocation.latitude}}<br>
+                    location lng:{{workingTag.markerLocation.longitude}}<br>
+                    <br><br>
+                </div>
+                <paper-fab id="closeSignTagButton" on-tap="closeShow" style="position: absolute; top: 5px; right: 5px; background-color:#bdbdbd;" icon="close"></paper-fab>            
+            </div>
+            </paper-material>
+            <br>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'tt-show',
+
+            properties: {
+                page: {
+                    type: String,
+                    notify: true
+                },                
+                workingTag: {
+                    type:   Object,                                   
+                    notify: true
+                }  
+            },
+            
+            closeShow: function() {
+                this.page = "list";
+            }            
+
+            /*******
+            // Note: An alternative to waiting for, and entering a txt code, is to send a txt 
+            // from the client to a twilio number with a unique pin for the tag to be activated.
+            // ex: "sendSignature"(resp.authorPin, resp.txtCallBackNumber);                
+            sendTxt: function() {
+                //alert("authorPin:" + this.authorPin + " txtCallBackNumber:" + this.txtCallBackNumber);
+                location.href = "sms:" + this.txtCallBackNumber + ";?&body=" + this.authorPin;
+                //location.href='sms:14378000584;?&body=1234';
+                // old java twilio GET:  http://1-dot-bittagdemo.appspot.com//ServerTwilio?
+                // old java twilio POST: http://1-dot-bittagtest.appspot.com//tt_viewTag?tagId=5698390272770048
+            },
+            ********/            
+        });
+    </script>        
+
+    
+</dom-module>>

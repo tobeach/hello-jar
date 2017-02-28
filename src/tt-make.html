@@ -1,0 +1,502 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="tt-app-styles.html">
+
+<dom-module id="tt-make">
+    <template>
+        <style include="tt-app-styles">
+            :host {
+                display: block;
+                padding: 10px;
+            }
+            .workspace {
+                display:                flex;                
+                flex-direction:         column;      
+                align-content:          center;           
+                align-items:            center; 
+                justify-content:        center;               
+                display:                -webkit-flex;
+                -webkit-flex-direction: column;      
+                -webkit-align-content:  center; 
+                -webkit-align-items:    center;
+                -webkit-justify-content:center;           
+                width:                  100%;                
+            }
+            .expansion-area {
+                display:                flex;        
+                flex-direction:         column;              
+                align-content:          center;           
+                align-items:            center; 
+                justify-content:        flex-start;               
+                display:                -webkit-flex;
+                -webkit-flex-direction: column;      
+                -webkit-align-content:  center; 
+                -webkit-align-items:    center;
+                -webkit-justify-content:flex-start;           
+                width:                  90%; 
+                padding-top:            20px; 
+            }
+            .expansion-bar {
+                display:                inline-flex;        
+                flex-direction:         row;              
+                align-content:          flex-start;           
+                align-items:            flex-start; 
+                justify-content:        flex-end;               
+                display:                -webkit-inline-flex;
+                -webkit-flex-direction: row;      
+                -webkit-align-content:  -webkit-flex-start; 
+                -webkit-align-items:    -webkit-flex-start;
+                -webkit-justify-content:flex-end;           
+                width:                  100%;
+                height:                 50px;
+                margin-bottom:          1px;
+                background-color:       var(--paper-light-green-600);
+            }
+            .expansion-bar-top {
+                border-top-left-radius: 5px;
+                border-top-right-radius:5px;
+            }
+            .expansion-bar-bottom {
+                border-bottom-left-radius: 5px;
+                border-bottom-right-radius:5px;
+            }
+            .expansion-button {
+                display:                flex;                
+                justify-content:        center;               
+                display:                -webkit-flex;
+                -webkit-justify-content:center;           
+                width:                  100%;                             
+                height:                 50px;
+                margin:                 0;
+                padding-left:           10px;
+                border:                 0;               
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
+                background-color:       var(--paper-light-green-600);
+                -webkit-tap-highlight-color: rgba(0,0,0,0);
+                color:                  white;
+                font-size:              22px;
+                cursor:                 pointer;
+                text-align:             left;                
+            }
+            .expansion-icon {
+                display:                flex;                
+                justify-content:        center;               
+                display:                -webkit-flex;
+                -webkit-justify-content:center;           
+                margin:                 auto;
+                padding-right:          10px;
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 5px;
+                border:                 0;                                
+                color:                  white;
+                width:                  50px;
+                height:                 50px;
+                background-color:       var(--paper-light-green-600);
+            }            
+            .content {
+                display:                    flex;                
+                justify-content:            center;               
+                display:                    -webkit-flex;
+                -webkit-justify-content:    center;           
+                margin:                     auto;
+                padding:                    15px;
+                /* border: 1px solid #dedede; */
+                border:                     1px solid var(--paper-grey-300);
+                border-top:                 none;
+                border-bottom-left-radius:  5px;
+                border-bottom-right-radius: 5px;
+                @apply(--shadow-elevation-2dp);
+            }
+
+            .make-tag {
+                display:                flex;        
+                flex-direction:         column;              
+                align-content:          center;           
+                align-items:            center; 
+                justify-content:        center;               
+                display:                -webkit-flex;
+                -webkit-flex-direction: column;      
+                -webkit-align-content:  center; 
+                -webkit-align-items:    center;
+                -webkit-justify-content:center;           
+                width:                  100%;
+            }
+
+            .html-date-input {
+                width: 150px; 
+                height: 25px; 
+                font-size: 18px; 
+                font-family: Arial; 
+                border-radius: 5px; 
+                background: white;
+            }
+
+            .select-input {
+                width: 120px; 
+                height: 30px; 
+                font-size: 20px; 
+                border-radius: 5px; 
+                margin-top: 30px;
+            }
+
+            .dropdown-menu {
+                margin-top: 0px; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px;
+            }
+            .dropdown-menu-item {
+                min-height: 30px;
+            }
+        </style>
+
+        <!--app-route route="{{route}}" pattern="/:page" data="{{routeData}}"></app-route-->        
+
+        <div id="workspace" class="workspace">                    
+            <div id="expansion-area1" class="expansion-area">
+                
+                <div class="expansion-bar expansion-bar-top">
+                    <button class="expansion-button" aria-expanded$="[[isExpanded(opened1)]]" aria-controls="collapse1" on-click="toggle1"><div style="width: 100%;">1. Meeting location:</div></button>
+                    <br>
+                    <paper-icon-button id="icon1" class="expansion-icon" style="visibility: hidden;" icon="add-circle" on-click="toggle1"></paper-icon-button>
+                </div>
+                <iron-collapse style="width: 100%" id="drawer1" tabindex="0"  opened>
+                    <div class="content" style="padding-top:0px; padding-bottom:25px">
+                        <div class="make-tag">                                    
+                            <br><!--div style="text-align: center;">Meeting location:</div-->
+                            <paper-input value="{{workingTag.subject}}" id="maketag-tag-subject"    label="Meeting tag-name" placeholder="My meeting" maxlength="50" style="width: 250px;"></paper-input>
+                            <iron-autogrow-textarea value="{{workingTag.notes}}" id="maketag-tag-notes" rows="3" max-rows="3" placeholder="Message" style="width:250px; margin-top:20px;"></iron-autogrow-textarea>
+                            <!--paper-input value="{{workingTag.markerDescription}}" id="maketag-marker-description"    label="Location description"    maxlength="50" style="width: 250px;"></paper-input-->
+
+                            <div style="display: inline-flex;">
+                                <paper-input value="{{workingTag.markerLocation.latitude}}" hidden="true" id="maketag-marker-lat" label="Location latitude" style="margin-right: 10px;"></paper-input>
+                                <paper-input value="{{workingTag.markerLocation.longitude}}" hidden="true" id="maketag-marker-lng" label="Location longitude" style="margin-left: 10px;"></paper-input>
+                            </div>
+                            <br>
+                            <!--paper-button style="background-color: #8bc34a;" on-click="openMap" raised>OPEN MAP</paper-button-->       
+                            <paper-button style="background-color: #bdbdbd;" on-click="openMap" raised>OPEN MAP</paper-button>       
+                                                 
+
+                            <paper-tooltip for="maketag-tag-subject" offset="0">Describe the purpose of the meeting.</paper-tooltip>       
+                            <paper-tooltip for="maketag-marker-description" offset="0">Information to help the client find you, or the exact spot to meet.</paper-tooltip>       
+                            <paper-tooltip for="maketag-tag-notes" offset="0">Additional information about the meeting or location.</paper-tooltip>       
+
+                            <paper-tooltip for="maketag-marker-lat" offset="0">Manually enter a latitude, or drag the pin on the open map.</paper-tooltip>       
+                            <paper-tooltip for="maketag-marker-lng" offset="0">Manually enter a longitude, or drag the pin on the open map.</paper-tooltip>       
+                        </div>
+                    </div>
+                </iron-collapse>
+
+                <div class="expansion-bar">                                                        
+                    <button class="expansion-button" aria-expanded$="[[isExpanded(opened2)]]" aria-controls="collapse2" on-click="toggle2"><div style="width: 100%">2. Meeting timing:</div></button>
+                    <paper-icon-button id="icon2" class="expansion-icon" icon="add-circle" on-click="toggle2"></paper-icon-button>
+                </div>
+                <iron-collapse style="width: 100%" id="drawer2" tabindex="1">
+
+                <!--div class="content">
+                    <div class="make-tag">                                    
+                        <br><div style="text-align: center;">Rendevous time:</div>
+                        <paper-input label="Start date:time"></paper-input>
+                        <paper-input label="End date:time"></paper-input>
+                        <paper-button on-click="openDatetime" raised>Set date/time</paper-button>
+                    </div>
+                </div-->
+
+                    <div class="content">
+                        <div>                                    
+                            <br><div style="text-align: left;">Meeting date/time:</div>                                    
+                            <div style="text-align: left;">
+                                <br>
+                                <!--paper-material style="padding: 7px; border-radius: 5px;" elevation="1">  
+                                    <input class="html-date-input" type="date" name="rdate" value="1979-12-31"></input>
+                                </paper-material>
+                                <br>
+                                <paper-material style="padding: 7px; border-radius: 5px;" elevation="1">  
+                                    <input class="html-date-input" type="time" name="rtime" value="08:51"></input>
+                                </paper-material>                                        
+                                <br-->
+                                <input id="maketag-meeting-start-date" class="html-date-input" type="date" name="rdate" value="1979-12-31"></input>
+                                <br><br>
+                                <input id="maketag-meeting-start-time" class="html-date-input" type="time" name="rtime" value="08:51"></input>
+                                <br>                                        
+                            </div>
+                            <paper-dropdown-menu id="maketag-meeting-duration" class="select-input" label="Minimum stay-time:" vertical-align="bottom" horizontal-align="left">
+                            <paper-listbox class="dropdown-content  dropdown-menu" selected="0">
+                                <paper-item class="dropdown-menu-item">Just show up</paper-item>
+                                <paper-item class="dropdown-menu-item">1 minute</paper-item>
+                                <paper-item class="dropdown-menu-item">5 minutes</paper-item>
+                                <paper-item class="dropdown-menu-item">15 minutes</paper-item>
+                                <paper-item class="dropdown-menu-item">30 minutes</paper-item>
+                                <paper-item class="dropdown-menu-item">1 hour</paper-item>
+                                <!--paper-item class="dropdown-menu-item">Set custom</paper-item-->
+                            </paper-listbox>
+                            </paper-dropdown-menu>             
+                            <br>                     
+                            <br>  
+
+                            <!--br><div style="text-align: left;">Minimum stay-time:</div>                                    
+                            <br>
+                            <div style="text-align: left;">
+                                <select class="html-select-input">
+                                <option value="00-duration">none</option>
+                                <option value="01-duration">1 minute</option>
+                                <option value="05-duration">5 minutes</option>
+                                <option value="15-duration">15 minutes</option>
+                                <option value="custom-duration">Set custom</option>
+                                </select> 
+                                <br><br>
+                            </div-->
+                        </div>
+                    </div>
+                </iron-collapse>
+
+                <div id="expansion-bar3" class="expansion-bar expansion-bar-bottom">                                                        
+                    <button class="expansion-button" aria-expanded$="[[isExpanded(opened3)]]" aria-controls="collapse3" on-click="toggle3"><div style="width: 100%;">3. Payout promises:</div></button>
+                    <paper-icon-button id="icon3" class="expansion-icon" icon="add-circle" on-click="toggle3"></paper-icon-button>
+                </div>
+                <iron-collapse style="width: 100%" id="drawer3" tabindex="1">
+                    <div class="content">
+                        <div style="display: flex; flex-direction: column; align-items: center;">   
+                            <div style="width: 100%; display: inline-flex; align-items: center;">
+                                <gold-phone-input value="{{authorMobile}}" id="maketag-author-mobile" style="margin-bottom: 20px; width: 100%;" label="Your (tag author) mobile"></gold-phone-input>
+                            </div>
+                            <!-- client / participant / player / guest / receiver / member / host / author / creator / dealer / maker -->
+                            <paper-tooltip for="maketag-author-mobile">Used for system security and NOT shared with RSVP tag clients.</paper-tooltip>   
+                            <paper-tooltip for="maketag-client-penalty">Payed to you by the RSVP client, if the client is NOT on-time.</paper-tooltip>       
+                            <paper-tooltip for="maketag-client-reward">Payed to the RSVP client by you, if the client is on-time.</paper-tooltip>       
+                            <paper-tooltip for="maketag-author-penalty">Payed to the RSVP client by you, if YOU are not on-time.</paper-tooltip>       
+                            <paper-tooltip for="maketag-author-reward">Payed to you by the RSVP client, if YOU are on-time.</paper-tooltip>       
+
+                            <div style="display: inline-flex; align-items: center;">
+                                <paper-dropdown-menu id="maketag-client-penalty" class="select-input" style="margin-top: 0px; padding-right: 30px; padding-top: 0px;" label="Tag client penalty:" vertical-align="bottom" horizontal-align="left">
+                                <paper-listbox class="dropdown-content dropdown-menu" selected="0">
+                                    <paper-item class="dropdown-menu-item">none</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 0.25</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 1.00</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 5.00</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 10.00</paper-item>
+                                    <!--paper-item class="dropdown-menu-item">Custom</paper-item-->
+                                </paper-listbox>
+                                </paper-dropdown-menu>             
+                                <!-- Timely / punctionality / prompt / on-time -->
+                                <paper-dropdown-menu id="maketag-client-reward" class="select-input" style="margin-top: 0px; padding-top: 0px;" label="Tag client reward:" vertical-align="bottom" horizontal-align="left">
+                                <paper-listbox class="dropdown-content dropdown-menu" selected="0">
+                                    <paper-item class="dropdown-menu-item">none</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 0.25</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 1.00</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 5.00</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 10.00</paper-item>
+                                    <!--paper-item class="dropdown-menu-item">Custom</paper-item-->
+                                </paper-listbox>
+                            </paper-dropdown-menu>             
+                            </div>
+                            <br>
+                            <div style="display: inline-flex; align-items: center;">
+                                <paper-dropdown-menu id="maketag-author-penalty" class="select-input" style="padding-right: 30px;" label="Tag author penalty:" vertical-align="bottom" horizontal-align="left">
+                                <paper-listbox class="dropdown-content dropdown-menu" selected="0">
+                                    <paper-item class="dropdown-menu-item">none</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 0.25</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 1.00</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 5.00</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 10.00</paper-item>
+                                    <!--paper-item class="dropdown-menu-item">Custom</paper-item-->
+                                </paper-listbox>
+                                </paper-dropdown-menu>             
+                                <paper-dropdown-menu id="maketag-author-reward" class="select-input" label="Tag author reward:" vertical-align="bottom" horizontal-align="left">
+                                <paper-listbox class="dropdown-content dropdown-menu" selected="0">
+                                    <paper-item class="dropdown-menu-item">none</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 0.25</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 1.00</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 5.00</paper-item>
+                                    <paper-item class="dropdown-menu-item">$ 10.00</paper-item>
+                                    <!--paper-item class="dropdown-menu-item">Custom</paper-item-->
+                                </paper-listbox>
+                                </paper-dropdown-menu>             
+                            </div>
+                            <br>                     
+                            <br><br>  
+                        </div>
+                    </div>
+                </iron-collapse>
+            </div>
+
+            <div style="width:100%; margin-top: 5px; font-style: bo" align='center'>
+                <paper-button id=saveTagButton on-click="saveTag" raised>SAVE TAG</paper-icon-button>                                                                        
+            </div>
+            <paper-spinner id=spin-make-tag></paper-spinner>                    
+        </div>    
+    </template>
+
+    <script>
+        Polymer({
+            is: 'tt-make',
+
+        properties: {
+            page: {
+                type: String,
+                notify: true
+            },
+            workingTag: {
+                type:   Object,                                   
+                notify: true
+            },            
+            authorMobile: {
+                type: String,
+                notify: true
+            },                                                
+            currentOpenDrawer: {
+                type: String,
+                value: '#drawer1'
+            },
+            currentOpenDrawerIcon: {
+                type: String,
+                value: '#icon1'
+            },
+        },
+        // end-properties
+
+        attached: function() {
+            var now = new Date();
+            var isoStr  = now.toISOString();    // '2017-01-20T14:50:21.281Z'
+            var isoDate = isoStr.slice(0,10);   // '2017-01-20'
+            var isoTime = isoStr.slice(11,16);  // '14:50'
+            this.$$('#maketag-meeting-start-date').value = isoDate;
+            this.$$('#maketag-meeting-start-time').value = isoTime;
+        },
+
+        // Note that we can either handle the error condition below, or we
+        // can give the option to re-send the txt from the sign screen.
+        // TODO: validate that all required tag fields are filled.
+        saveTag: function() {            
+            let mythis = this;
+            tt.makeTag(this).then(function(response) {
+                console.log("saveTag success. response:", response);
+                let reply = new Object();
+                reply = JSON.parse(response);
+                if( reply.rc == 0 ) {
+                    mythis.workingTag = reply.data.ttTag;
+                    mythis.notifyPath('workingTag.isAuthorSigned'); 
+                    mythis.notifyPath('workingTag.subject'); 
+                    mythis.notifyPath('workingTag.notes'); 
+                    
+                    mythis.page = "sign";   // Tag saved. Sign the tag.
+                }
+                else {
+                    mythis.page = "make";   // Tag not saved. ##!! TODO: send user to a re-try screen.
+                }
+
+            }, function(error) {
+                console.error("Failed!", error);
+                mythis.page = "make";       // The call failed. ##!! TODO: send user to a re-try screen.
+            })            
+        },
+
+        /*******
+        // Note: An alternative to waiting for, and entering a txt code, is to send a txt 
+        // from the client to a twilio number with a unique pin for the tag to be activated.
+        // ex: "sendSignature"(resp.authorPin, resp.txtCallBackNumber);                
+        sendTxt: function() {
+            location.href='sms:14378000584;?&body=1234';
+            // twilio GET:  http://1-dot-bittagdemo.appspot.com//ServerTwilio?
+            // twilio POST: http://1-dot-bittagtest.appspot.com//tt_viewTag?tagId=5698390272770048
+        },
+        *******/
+
+        toggle1: function() {
+            // Ensure one drawer is always open. (i.e. Don't close all drawers)
+            if( this.currentOpenDrawer == "#drawer1" )
+                return;
+            
+            // close the currently open drawer
+            this.$$(this.currentOpenDrawer).opened = false;
+            // turn-on the currently open drawer's expansion ('+') icon
+            this.$$(this.currentOpenDrawerIcon).style.visibility = "visible";                        
+            // open this drawer.
+            this.$$('#drawer1').opened = true;
+            this.currentOpenDrawer = "#drawer1";
+            // HACK: turn-on the bottom 'curve' when the bottom expansion-bar is closed.
+            //this.$$('#expansion-bar3').style['border-bottom-left-radius'] = '5px';
+            this.$$('#expansion-bar3').style.borderBottomLeftRadius = "5px";
+            this.$$('#expansion-bar3').style.borderBottomRightRadius = "5px";                        
+            // turn-off this drawer's expansion ('+') icon
+            this.$$('#icon1').style.visibility = "hidden";
+            this.currentOpenDrawerIcon = "#icon1";
+        },
+
+        toggle2: function() {
+            // Ensure one drawer is always open. (i.e. Don't close all drawers)
+            if( this.currentOpenDrawer == "#drawer2" )
+                return;
+
+            // close the currently open drawer
+            this.$$(this.currentOpenDrawer).opened = false;
+            // turn-on the currently open drawer's expansion ('+') icon
+            this.$$(this.currentOpenDrawerIcon).style.visibility = "visible";                                    
+            // open this drawer.
+            this.$$('#drawer2').opened = true;
+            this.currentOpenDrawer = "#drawer2";
+            // HACK: turn-on the bottom 'curve' when the bottom expansion-bar is closed.
+            //this.$$('#expansion-bar3').style['border-bottom-left-radius'] = '5px';
+            this.$$('#expansion-bar3').style.borderBottomLeftRadius = "5px";
+            this.$$('#expansion-bar3').style.borderBottomRightRadius = "5px";            
+            // turn-off this drawer's expansion ('+') icon
+            this.$$('#icon2').style.visibility = "hidden";
+            this.currentOpenDrawerIcon = "#icon2";            
+        },
+
+        toggle3: function() {
+            // Ensure one drawer is always open. (i.e. Don't close all drawers)
+            if( this.currentOpenDrawer == "#drawer3" )
+                return;
+
+            // close the currently open drawer
+            this.$$(this.currentOpenDrawer).opened = false;
+            // turn-on the currently open drawer's expansion ('+') icon
+            this.$$(this.currentOpenDrawerIcon).style.visibility = "visible";                                                
+            // open this drawer.            
+            this.$$('#drawer3').opened = true;
+            this.currentOpenDrawer = "#drawer3";
+            // HACK: turn-off the bottom 'curve' when the bottom expansion-bar is open.
+            //this.$$('#expansion-bar3').style['border-bottom-left-radius'] = '0px';
+            this.$$('#expansion-bar3').style.borderBottomLeftRadius = "0px";
+            this.$$('#expansion-bar3').style.borderBottomRightRadius = "0px";                        
+            // turn-off this drawer's expansion ('+') icon
+            this.$$('#icon3').style.visibility = "hidden";
+            this.currentOpenDrawerIcon = "#icon3";                        
+        },
+
+        openMap: function() {        
+            this.page = "map";
+        },
+
+        openDatetime: function() {
+            // save the statically declared tag creation fragmant
+            this.tagFragment =  this.$$('#expansion-area1');
+            // create a datetime location fragment
+            var datetimeFragment = document.createElement('tt-datetime');
+            
+            datetimeFragment.addEventListener("click", this.closeDatetime);
+            datetimeFragment["tagFragment"] = this.tagFragment;
+            this.tagFragment.parentNode.replaceChild(datetimeFragment, this.tagFragment);            
+        },
+
+        closeDatetime: function() {
+            this.parentNode.replaceChild(this.tagFragment, this);
+        },
+    });
+
+    </script>        
+
+</dom-module>>
